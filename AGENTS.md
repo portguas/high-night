@@ -1,8 +1,12 @@
 # 项目协作约定（AGENTS）
 
+## 回答
+- 所有回答使用中文
+
 ## 项目类型
 - Vue 3 + uni-app 小程序项目
 - UI 组件与库优先使用 uni-app 官方提供的组件与能力
+- 使用dart-sass
 
 ## 开发与运行
 - 安装依赖：`pnpm install` 或 `npm install`
