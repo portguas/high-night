@@ -6,12 +6,14 @@
 			<image class="bg-noise" :src="noiseImage" mode="aspectFill" />
 		</view>
 
-		<view class="content">
-			<view class="header">
-				<view class="header-spacer"></view>
-				<text class="header-title">夜场游戏</text>
-				<text class="header-spacer-text">// Spacer</text>
-			</view>
+			<view class="content">
+				<view class="header">
+					<view class="header-spacer"></view>
+					<text class="header-title">夜场游戏</text>
+					<view class="header-action" @tap="handleSettings">
+						<uni-icons type="settings" size="24" color="rgba(255, 255, 255, 0.9)" />
+					</view>
+				</view>
 
 			<view class="main">
 				<view class="game-list">
@@ -30,18 +32,23 @@
 					<text class="slogan-text">适度饮酒 • 享受夜晚</text>
 				</view>
 			</view>
+			</view>
+			<SettingsModal ref="settingsModal" />
 		</view>
-	</view>
-</template>
+	</template>
 
-<script setup>
-	const backgroundImage = '/static/assets/party/background.jpg'
-	const noiseImage = '/static/assets/party/noise.png'
-	const games = [{
-			title: '霓虹骰子',
-			desc: '经典聚会必备，比大小',
-			icon: '/static/assets/party/icon-dice.svg'
-		},
+	<script setup>
+		import { ref } from 'vue'
+		import SettingsModal from '../../components/SettingsModal.vue'
+
+		const backgroundImage = '/static/assets/party/background.jpg'
+		const noiseImage = '/static/assets/party/noise.png'
+		const settingsModal = ref(null)
+		const games = [{
+				title: '霓虹骰子',
+				desc: '经典聚会必备，比大小',
+				icon: '/static/assets/party/icon-dice.svg'
+			},
 		{
 			title: '真心话大冒险',
 			desc: '说出秘密或者接受惩罚',
@@ -69,6 +76,10 @@
 		uni.navigateTo({
 			url: item.path
 		})
+	}
+
+	const handleSettings = () => {
+		settingsModal.value?.open()
 	}
 </script>
 
@@ -138,6 +149,18 @@
 		height: 0;
 	}
 
+	.header-action {
+		width: 76rpx;
+		height: 76rpx;
+		border-radius: 9999rpx;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1rpx solid rgba(255, 255, 255, 0.08);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+	}
+
 	.header-title {
 		font-size: 38rpx;
 		line-height: 53rpx;
@@ -148,13 +171,6 @@
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		text-shadow: 0 0 20rpx rgba(139, 92, 246, 0.3);
-	}
-
-	.header-spacer-text {
-		font-size: 30rpx;
-		line-height: 46rpx;
-		color: #ffffff;
-		opacity: 0.9;
 	}
 
 	.main {

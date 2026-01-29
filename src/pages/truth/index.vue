@@ -6,14 +6,13 @@
 			<image class="bg-noise" :src="noiseImage" mode="aspectFill" />
 		</view>
 
-		<view class="content">
-			<view class="header">
-				<view class="back-button" @tap="handleBack">
-					<image class="back-icon" :src="icons.back" mode="aspectFit" />
+			<view class="content">
+				<view class="header">
+					<view class="back-button" @tap="handleBack">
+						<image class="back-icon" :src="icons.back" mode="aspectFit" />
+					</view>
+					<text class="header-title">真心话大冒险</text>
 				</view>
-				<text class="header-title">真心话大冒险</text>
-				<text class="header-spacer">// Spacer</text>
-			</view>
 
 			<view class="main">
 				<view class="game">
@@ -44,18 +43,18 @@
 					</view>
 				</view>
 			</view>
+			</view>
 		</view>
-	</view>
-</template>
+	</template>
 
-<script setup>
-	const backgroundImage = '/static/assets/truth/background.jpg'
-	const noiseImage = '/static/assets/truth/noise.png'
-	const icons = {
-		back: '/static/assets/truth/icon-back.svg',
-		spark: '/static/assets/truth/icon-spark.svg',
-		heart: '/static/assets/truth/icon-heart.svg',
-		flame: '/static/assets/truth/icon-flame.svg'
+	<script setup>
+		const backgroundImage = '/static/assets/truth/background.jpg'
+		const noiseImage = '/static/assets/truth/noise.png'
+		const icons = {
+			back: '/static/assets/truth/icon-back.svg',
+			spark: '/static/assets/truth/icon-spark.svg',
+			heart: '/static/assets/truth/icon-heart.svg',
+			flame: '/static/assets/truth/icon-flame.svg'
 	}
 
 	const handleBack = () => {
@@ -132,11 +131,10 @@
 		border-radius: 9999rpx;
 		background: rgba(255, 255, 255, 0.05);
 		border: 1.27rpx solid rgba(255, 255, 255, 0.05);
-		padding: 16.53rpx 16.53rpx 1.27rpx;
 		box-sizing: border-box;
 		display: flex;
-		align-items: flex-start;
-		justify-content: flex-start;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.back-icon {
@@ -157,16 +155,6 @@
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		text-shadow: 0 0 20rpx rgba(139, 92, 246, 0.3);
-	}
-
-	.header-spacer {
-		position: absolute;
-		left: 581.78rpx;
-		top: 104.87rpx;
-		font-size: 30.51rpx;
-		line-height: 45.76rpx;
-		color: #ffffff;
-		opacity: 0.9;
 	}
 
 	.main {
