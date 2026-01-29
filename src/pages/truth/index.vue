@@ -25,15 +25,15 @@
 							<text class="game-subtitle">选择你的命运</text>
 						</view>
 					</view>
-					<view class="choice-list">
-						<view class="choice-card truth">
+					<view class="choice-list" :class="{ 'is-hidden': !isChoiceVisible }">
+						<view class="choice-card truth" @tap="handleTruth">
 							<view class="choice-bg"></view>
 							<view class="choice-content">
 								<image class="choice-icon" :src="icons.heart" mode="aspectFit" />
 								<text class="choice-text">真心话</text>
 							</view>
 						</view>
-						<view class="choice-card dare">
+						<view class="choice-card dare" @tap="handleDare">
 							<view class="choice-bg"></view>
 							<view class="choice-content">
 								<image class="choice-icon" :src="icons.flame" mode="aspectFit" />
@@ -44,12 +44,21 @@
 				</view>
 			</view>
 			</view>
+			<TruthPromptModal ref="truthModal" @closed="handlePromptClosed" />
+			<DarePromptModal ref="dareModal" @closed="handlePromptClosed" />
 		</view>
 	</template>
 
 	<script setup>
+		import { ref } from 'vue'
+		import TruthPromptModal from '../../components/TruthPromptModal.vue'
+		import DarePromptModal from '../../components/DarePromptModal.vue'
+
 		const backgroundImage = '/static/assets/truth/background.jpg'
 		const noiseImage = '/static/assets/truth/noise.png'
+		const truthModal = ref(null)
+		const dareModal = ref(null)
+		const isChoiceVisible = ref(true)
 		const icons = {
 			back: '/static/assets/truth/icon-back.svg',
 			spark: '/static/assets/truth/icon-spark.svg',
@@ -61,6 +70,24 @@
 		uni.navigateBack({
 			delta: 1
 		})
+	}
+
+	const handleTruth = () => {
+		isChoiceVisible.value = false
+		setTimeout(() => {
+			truthModal.value?.open()
+		}, 150)
+	}
+
+	const handleDare = () => {
+		isChoiceVisible.value = false
+		setTimeout(() => {
+			dareModal.value?.open()
+		}, 150)
+	}
+
+	const handlePromptClosed = () => {
+		isChoiceVisible.value = true
 	}
 </script>
 
@@ -228,6 +255,13 @@
 		display: flex;
 		flex-direction: column;
 		margin-top: auto;
+		transition: opacity 0.25s ease, transform 0.25s ease;
+	}
+
+	.choice-list.is-hidden {
+		opacity: 0;
+		transform: translateY(20rpx);
+		pointer-events: none;
 	}
 
 	.choice-card {
