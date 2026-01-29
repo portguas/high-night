@@ -15,7 +15,7 @@
 
 			<view class="main">
 				<view class="game-list">
-					<view class="game-card" v-for="item in games" :key="item.title">
+					<view class="game-card" v-for="item in games" :key="item.title" @tap="handleGameClick(item)">
 						<view class="game-card-glass"></view>
 						<view class="game-icon-wrap">
 							<image class="game-icon" :src="item.icon" mode="aspectFit" />
@@ -34,35 +34,41 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				backgroundImage: '/static/assets/party/background.jpg',
-				noiseImage: '/static/assets/party/noise.png',
-				games: [{
-						title: '霓虹骰子',
-						desc: '经典聚会必备，比大小',
-						icon: '/static/assets/party/icon-dice.svg'
-					},
-					{
-						title: '真心话大冒险',
-						desc: '说出秘密或者接受惩罚',
-						icon: '/static/assets/party/icon-truth.svg'
-					},
-					{
-						title: '鳄鱼拔牙',
-						desc: '赛博版俄罗斯轮盘，谁是倒霉蛋',
-						icon: '/static/assets/party/icon-croc.svg'
-					},
-					{
-						title: '石头剪刀布',
-						desc: '决战时刻，输了就喝',
-						icon: '/static/assets/party/icon-rps.svg'
-					}
-				]
-			}
+<script setup>
+	const backgroundImage = '/static/assets/party/background.jpg'
+	const noiseImage = '/static/assets/party/noise.png'
+	const games = [{
+			title: '霓虹骰子',
+			desc: '经典聚会必备，比大小',
+			icon: '/static/assets/party/icon-dice.svg'
+		},
+		{
+			title: '真心话大冒险',
+			desc: '说出秘密或者接受惩罚',
+			icon: '/static/assets/party/icon-truth.svg',
+			path: '/pages/truth/index'
+		},
+		{
+			title: '鳄鱼拔牙',
+			desc: '赛博版俄罗斯轮盘，谁是倒霉蛋',
+			icon: '/static/assets/party/icon-croc.svg'
+		},
+		{
+			title: '石头剪刀布',
+			desc: '决战时刻，输了就喝',
+			icon: '/static/assets/party/icon-rps.svg'
 		}
+	]
+
+	const handleGameClick = (item) => {
+		console.log('[home] tap game', item)
+		if (!item.path) {
+			console.log('[home] no path, skip navigate')
+			return
+		}
+		uni.navigateTo({
+			url: item.path
+		})
 	}
 </script>
 
@@ -78,7 +84,7 @@
 		font-family: Arial, sans-serif;
 		overflow: hidden;
 	}
-
+「方案选单」
 	.bg-layer {
 		position: absolute;
 		inset: 0;
