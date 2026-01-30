@@ -6,14 +6,13 @@
 			<image class="bg-noise" :src="noiseImage" mode="aspectFill" />
 		</view>
 
-			<view class="content">
-				<view class="header">
-					<view class="header-spacer"></view>
-					<text class="header-title">夜场游戏</text>
-					<view class="header-action" @tap="handleSettings">
-						<uni-icons type="settings" size="24" color="rgba(255, 255, 255, 0.9)" />
-					</view>
-				</view>
+		<view class="content">
+			<view class="nav-title" :style="navTitleStyle">
+				<text class="nav-title-text">夜场游戏</text>
+			</view>
+			<view class="nav-action" :style="navActionStyle" @tap="handleSettings">
+				<uni-icons type="settings" size="24" color="rgba(255, 255, 255, 0.9)" />
+			</view>
 
 			<view class="main">
 				<view class="game-list">
@@ -32,18 +31,20 @@
 					<text class="slogan-text">适度饮酒 • 享受夜晚</text>
 				</view>
 			</view>
-			</view>
-			<SettingsModal ref="settingsModal" />
 		</view>
-	</template>
+		<SettingsModal ref="settingsModal" />
+	</view>
+</template>
 
 	<script setup>
-		import { ref } from 'vue'
+		import { onMounted, ref } from 'vue'
 		import SettingsModal from '../../components/SettingsModal.vue'
 
 		const backgroundImage = '/static/assets/party/background.jpg'
 		const noiseImage = '/static/assets/party/noise.png'
 		const settingsModal = ref(null)
+		const navActionStyle = ref({})
+		const navTitleStyle = ref({})
 		const games = [{
 				title: '霓虹骰子',
 				desc: '经典聚会必备，比大小',
@@ -81,6 +82,45 @@
 	const handleSettings = () => {
 		settingsModal.value?.open()
 	}
+
+	const setNavActionStyle = () => {
+		const getMenuButton = uni.getMenuButtonBoundingClientRect
+		const getSystemInfo = uni.getSystemInfoSync
+		if (typeof getMenuButton === 'function' && typeof getSystemInfo === 'function') {
+			const menuButton = getMenuButton()
+			const systemInfo = getSystemInfo()
+			if (menuButton && systemInfo?.screenWidth) {
+				const gap = 12
+				const top = `${menuButton.top}px`
+				const height = `${menuButton.height}px`
+				navActionStyle.value = {
+					top,
+					left: `${gap}px`,
+					width: `${menuButton.height}px`,
+					height
+				}
+				navTitleStyle.value = {
+					top,
+					height
+				}
+				return
+			}
+		}
+		navActionStyle.value = {
+			top: 'calc(var(--status-bar-height) + 12rpx)',
+			left: '24rpx',
+			width: '64rpx',
+			height: '64rpx'
+		}
+		navTitleStyle.value = {
+			top: 'calc(var(--status-bar-height) + 12rpx)',
+			height: '64rpx'
+		}
+	}
+
+	onMounted(() => {
+		setNavActionStyle()
+	})
 </script>
 
 <style lang="scss">
@@ -95,7 +135,6 @@
 		font-family: Arial, sans-serif;
 		overflow: hidden;
 	}
-「方案选单」
 	.bg-layer {
 		position: absolute;
 		inset: 0;
@@ -135,21 +174,9 @@
 		flex-direction: column;
 	}
 
-	.header {
-		height: 175.4rpx;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 92rpx 46rpx 0;
-		box-sizing: border-box;
-	}
-
-	.header-spacer {
-		width: 76rpx;
-		height: 0;
-	}
-
-	.header-action {
+	.nav-action {
+		position: fixed;
+		z-index: 10;
 		width: 76rpx;
 		height: 76rpx;
 		border-radius: 9999rpx;
@@ -161,11 +188,23 @@
 		box-sizing: border-box;
 	}
 
-	.header-title {
-		font-size: 38rpx;
-		line-height: 53rpx;
+	.nav-title {
+		position: fixed;
+		left: 0;
+		right: 0;
+		z-index: 9;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0 140rpx;
+		pointer-events: none;
+	}
+
+	.nav-title-text {
+		font-size: 38.14rpx;
+		line-height: 53.39rpx;
 		font-weight: 700;
-		letter-spacing: 2rpx;
+		letter-spacing: 1.91rpx;
 		text-transform: uppercase;
 		background-image: linear-gradient(90deg, #c27aff 0%, #51a2ff 100%);
 		-webkit-background-clip: text;
@@ -174,7 +213,7 @@
 	}
 
 	.main {
-		padding: 46rpx;
+		padding: calc(var(--status-bar-height) + 200rpx) 46rpx 46rpx;
 		box-sizing: border-box;
 	}
 

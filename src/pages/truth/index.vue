@@ -19,10 +19,7 @@
 					<view class="game-title-block">
 						<view class="game-heading">
 							<image class="game-heading-icon" :src="icons.spark" mode="aspectFit" />
-							<text class="game-heading-text">真心话大冒险</text>
-						</view>
-						<view class="game-subtitle-wrap">
-							<text class="game-subtitle">选择你的命运</text>
+							<text class="game-heading-text">选择你的命运</text>
 						</view>
 					</view>
 					<view class="choice-list" :class="{ 'is-hidden': !isChoiceVisible }">
@@ -153,6 +150,7 @@
 		position: absolute;
 		left: 30.51rpx;
 		top: 91.53rpx;
+		z-index: 2;
 		width: 78.81rpx;
 		height: 78.81rpx;
 		border-radius: 9999rpx;
@@ -171,8 +169,11 @@
 
 	.header-title {
 		position: absolute;
-		left: 161.29rpx;
+		left: 0;
+		right: 0;
 		top: 104.24rpx;
+		text-align: center;
+		pointer-events: none;
 		font-size: 38.14rpx;
 		line-height: 53.39rpx;
 		font-weight: 700;
@@ -210,27 +211,24 @@
 	.game-heading {
 		height: 61.02rpx;
 		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12rpx;
 	}
 
 	.game-heading-icon {
-		position: absolute;
-		left: 0;
-		top: 7.63rpx;
 		width: 45.76rpx;
 		height: 45.76rpx;
 	}
 
 	.game-heading-text {
-		position: absolute;
-		left: 198.31rpx;
-		top: -3.81rpx;
-		transform: translateX(-50%);
-		font-size: 45.76rpx;
+		font-size: 26.69rpx;
 		line-height: 61.02rpx;
 		font-weight: 700;
 		white-space: nowrap;
 		text-align: center;
-		color: #ffffff;
+		color: rgba(255, 255, 255, 0.75);
 	}
 
 	.game-subtitle-wrap {
