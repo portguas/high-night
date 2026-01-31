@@ -21,7 +21,7 @@
 						<view class="game-title">
 							<text class="game-title-text">CROCO BITE</text>
 						</view>
-						<view class="crocodile">
+						<view class="crocodile" :class="{ 'is-closing': isMouthClosing }">
 							<view class="crocodile-glow"></view>
 						<view class="crocodile-mouth">
 							<view class="mouth-inner">
@@ -94,6 +94,15 @@
 				</view>
 			</view>
 		</view>
+		<view v-if="isGameOver" class="game-over-mask">
+			<view class="game-over-card">
+				<text class="game-over-title">游戏结束</text>
+				<text class="game-over-desc">鳄鱼咬到你了</text>
+				<view class="game-over-actions">
+					<view class="game-over-btn" @tap="resetGame">再来一局</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -103,10 +112,13 @@
 	const backgroundImage = '/static/assets/crocodile/background.jpg'
 	const noiseImage = '/static/assets/crocodile/noise.png'
 	const backIcon = '/static/assets/crocodile/icon-back.svg'
-	const navActionStyle = ref({})
-	const navTitleStyle = ref({})
-	const isBlinking = ref(false)
-	let blinkTimer = null
+		const navActionStyle = ref({})
+		const navTitleStyle = ref({})
+		const isBlinking = ref(false)
+		const isMouthClosing = ref(false)
+		const isGameOver = ref(false)
+		let blinkTimer = null
+		let gameOverTimer = null
 	const teeth = ref(
 		Array.from({ length: 10 }, (_, index) => {
 			const side = index < 5 ? 'left' : 'right'
@@ -134,9 +146,20 @@
 		if (tooth.state !== 'idle') {
 			return
 		}
+		if (isGameOver.value || isMouthClosing.value) {
+			return
+		}
 		tooth.pressed = true
 		if (tooth.id === badToothId.value) {
 			tooth.state = 'hit'
+			isMouthClosing.value = true
+			if (gameOverTimer) {
+				clearTimeout(gameOverTimer)
+			}
+			gameOverTimer = setTimeout(() => {
+				isGameOver.value = true
+				gameOverTimer = null
+			}, 420)
 			return
 		}
 		tooth.state = 'miss'
@@ -160,6 +183,22 @@
 				blinkTimer = null
 			}, 320)
 		})
+	}
+
+	const resetGame = () => {
+		isGameOver.value = false
+		isMouthClosing.value = false
+		if (gameOverTimer) {
+			clearTimeout(gameOverTimer)
+			gameOverTimer = null
+		}
+		teeth.value.forEach((tooth) => {
+			tooth.state = 'idle'
+			tooth.pulse = false
+			tooth.pressed = false
+		})
+		const randomIndex = Math.floor(Math.random() * teeth.value.length)
+		badToothId.value = teeth.value[randomIndex]?.id || ''
 	}
 
 	const setNavActionStyle = () => {
@@ -383,6 +422,7 @@
 		box-sizing: border-box;
 		overflow: hidden;
 		transform: translateX(-50%);
+		transition: height 0.35s ease, border-radius 0.35s ease;
 	}
 
 	.mouth-inner {
@@ -394,6 +434,8 @@
 		background: #5d1a1a;
 		border-radius: 76.27rpx 76.27rpx 120rpx 120rpx;
 		overflow: hidden;
+		transform-origin: top;
+		transition: transform 0.35s ease, opacity 0.35s ease;
 	}
 
 	.mouth-shadow {
@@ -406,6 +448,7 @@
 		filter: blur(12px);
 		border-radius: 9999rpx;
 		transform: translateX(-50%);
+		transition: transform 0.35s ease, opacity 0.35s ease;
 	}
 
 	.tongue {
@@ -419,6 +462,8 @@
 		border-radius: 9999rpx 9999rpx 0 0;
 		box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
 		transform: translateX(-50%);
+		transform-origin: top;
+		transition: transform 0.35s ease, opacity 0.35s ease;
 	}
 
 	.mouth-inner-shadow {
@@ -538,6 +583,31 @@
 		box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
 		box-sizing: border-box;
 		overflow: visible;
+		transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1.1);
+	}
+
+	.crocodile.is-closing .crocodile-head {
+		transform: translateY(210rpx);
+	}
+
+	.crocodile.is-closing .crocodile-mouth {
+		height: 300rpx;
+		border-radius: 38.14rpx 38.14rpx 90rpx 90rpx;
+	}
+
+	.crocodile.is-closing .mouth-inner {
+		transform: scaleY(0.2);
+		opacity: 0.2;
+	}
+
+	.crocodile.is-closing .tongue {
+		opacity: 0;
+		transform: translateX(-50%) scaleY(0.1);
+	}
+
+	.crocodile.is-closing .mouth-shadow {
+		opacity: 0;
+		transform: translateX(-50%) scale(0.3);
 	}
 
 	.head-bump {
@@ -681,5 +751,54 @@
 		100% {
 			transform: translateY(0);
 		}
+	}
+
+	.game-over-mask {
+		position: fixed;
+		inset: 0;
+		background: rgba(8, 10, 14, 0.7);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 30;
+	}
+
+	.game-over-card {
+		width: 560rpx;
+		background: rgba(18, 22, 30, 0.95);
+		border: 1rpx solid rgba(255, 255, 255, 0.08);
+		border-radius: 28rpx;
+		padding: 48rpx 40rpx 40rpx;
+		text-align: center;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+	}
+
+	.game-over-title {
+		font-size: 40rpx;
+		font-weight: 700;
+		letter-spacing: 2rpx;
+		color: #ffffff;
+	}
+
+	.game-over-desc {
+		display: block;
+		margin-top: 16rpx;
+		font-size: 26rpx;
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.game-over-actions {
+		margin-top: 36rpx;
+		display: flex;
+		justify-content: center;
+	}
+
+	.game-over-btn {
+		padding: 18rpx 60rpx;
+		border-radius: 9999rpx;
+		background: linear-gradient(90deg, #00d492 0%, #00b7ff 100%);
+		color: #0b0f14;
+		font-weight: 700;
+		letter-spacing: 2rpx;
 	}
 </style>
