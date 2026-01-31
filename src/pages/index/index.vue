@@ -65,7 +65,8 @@
 		{
 			title: '石头剪刀布',
 			desc: '决战时刻，输了就喝',
-			icon: '/static/assets/party/icon-rps.svg'
+			icon: '/static/assets/party/icon-rps.svg',
+			path: '/pages/rps/index'
 		}
 	]
 
