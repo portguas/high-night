@@ -59,7 +59,8 @@
 		{
 			title: '鳄鱼拔牙',
 			desc: '赛博版俄罗斯轮盘，谁是倒霉蛋',
-			icon: '/static/assets/party/icon-croc.svg'
+			icon: '/static/assets/party/icon-croc.svg',
+			path: '/pages/crocodile/index'
 		},
 		{
 			title: '石头剪刀布',
