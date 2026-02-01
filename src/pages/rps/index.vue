@@ -65,10 +65,10 @@
 					<view v-if="showStart" class="start-btn" @tap="handleStart">
 						<text class="start-btn-text">开始游戏</text>
 					</view>
-					<view v-if="isCounting" class="countdown">
+					<view v-else-if="gameState === GameState.COUNTING" class="countdown">
 						<text class="countdown-text">{{ countdown }}</text>
 					</view>
-					<view v-if="gamePhase === 'result'" class="result-panel">
+					<view v-if="showResultPanel" class="result-panel">
 						<view class="result-banner" :class="resultClass">
 							<view class="result-banner-inner">
 								<image class="result-icon" :src="resultIcon" mode="aspectFit" />
@@ -95,18 +95,21 @@
 	const resultIcon = '/static/assets/rps/icon-trophy.svg'
 	const navActionStyle = ref({})
 	const navTitleStyle = ref({})
-	const isCounting = ref(false)
-	const countdown = ref(3)
-	const gamePhase = ref('idle')
+	const countdown = ref(0)
+	const GameState = Object.freeze({
+		READY: 'ready',
+		COUNTING: 'counting',
+		ROLLING: 'rolling',
+		RESULT: 'result',
+		ROUND_OVER: 'round-over'
+	})
+	const gameState = ref(GameState.READY)
 	const matchMode = ref('single')
 	const winTarget = ref(1)
 	const scoreRed = ref(0)
 	const scoreBlue = ref(0)
-	const matchOver = ref(false)
-	const userReady = ref(false)
-	const opponentReady = ref(false)
-	const userRolling = ref(false)
-	const opponentRolling = ref(false)
+	const userPunched = ref(false)
+	const opponentPunched = ref(false)
 	const gestureIndexTop = ref(0)
 	const gestureIndexBottom = ref(1)
 	const winner = ref('draw')
@@ -195,16 +198,20 @@
 		}
 	})
 
-	const isPulsing = computed(() => ['counting', 'ready', 'rolling'].includes(gamePhase.value))
-	const isRoundActive = computed(() => ['counting', 'ready', 'rolling'].includes(gamePhase.value))
+	const isPulsing = computed(() => [GameState.COUNTING, GameState.ROLLING].includes(gameState.value))
 	const showScoreboard = computed(() => matchMode.value !== 'single')
-	const showPunchHint = computed(() => isRoundActive.value && !userReady.value)
-	const showStart = computed(() => !isCounting.value && gamePhase.value === 'idle')
-	const showPunchHintTop = computed(() => isRoundActive.value && !opponentReady.value)
+	const showStart = computed(() => gameState.value === GameState.READY)
+	const showPunchHint = computed(
+		() => [GameState.COUNTING, GameState.ROLLING].includes(gameState.value) && !userPunched.value
+	)
+	const showPunchHintTop = computed(
+		() => [GameState.COUNTING, GameState.ROLLING].includes(gameState.value) && !opponentPunched.value
+	)
+	const showResultPanel = computed(() => [GameState.RESULT, GameState.ROUND_OVER].includes(gameState.value))
 	const topGesture = computed(() => gestures[gestureIndexTop.value])
 	const bottomGesture = computed(() => gestures[gestureIndexBottom.value])
 	const nextRoundText = computed(() => {
-		if (showScoreboard.value && matchOver.value) {
+		if (gameState.value === GameState.ROUND_OVER) {
 			return '开始下一轮'
 		}
 		return '下一局'
@@ -232,13 +239,12 @@
 	})
 
 	const handleStart = () => {
-		if (isCounting.value) {
+		if (gameState.value === GameState.COUNTING) {
 			return
 		}
 		resetRoundState()
-		isCounting.value = true
 		countdown.value = 3
-		gamePhase.value = 'counting'
+		gameState.value = GameState.COUNTING
 		if (countdownTimer) {
 			clearInterval(countdownTimer)
 		}
@@ -248,16 +254,21 @@
 				clearInterval(countdownTimer)
 				countdownTimer = null
 				setTimeout(() => {
-					isCounting.value = false
-					gamePhase.value = 'ready'
-					countdown.value = 3
+					gameState.value = GameState.ROLLING
+					countdown.value = 0
+					if (userPunched.value || opponentPunched.value) {
+						startRolling()
+						if (userPunched.value && opponentPunched.value) {
+							scheduleResult()
+						}
+					}
 				}, 500)
 			}
 		}, 1000)
 	}
 
 	const handleNextRound = () => {
-		if (showScoreboard.value && matchOver.value) {
+		if (gameState.value === GameState.ROUND_OVER) {
 			resetMatchState()
 			handleStart()
 			return
@@ -265,28 +276,33 @@
 		handleStart()
 	}
 
+	const advanceGesture = (role) => {
+		if (role === 'user') {
+			gestureIndexBottom.value = (gestureIndexBottom.value + 1) % gestures.length
+			return
+		}
+		gestureIndexTop.value = (gestureIndexTop.value + 1) % gestures.length
+	}
+
 	const handlePunch = (role) => {
-		if (!['ready', 'rolling'].includes(gamePhase.value)) {
+		if (![GameState.COUNTING, GameState.ROLLING].includes(gameState.value)) {
 			return
 		}
 		if (role === 'user') {
-			if (userReady.value) {
+			if (userPunched.value) {
 				return
 			}
-			userReady.value = true
-			userRolling.value = true
-			gamePhase.value = 'rolling'
-			startRolling()
+			userPunched.value = true
+			advanceGesture(role)
 		} else {
-			if (opponentReady.value) {
+			if (opponentPunched.value) {
 				return
 			}
-			opponentReady.value = true
-			opponentRolling.value = true
-			gamePhase.value = 'rolling'
-			startRolling()
+			opponentPunched.value = true
+			advanceGesture(role)
 		}
-		if (userReady.value && opponentReady.value) {
+		startRolling()
+		if (gameState.value === GameState.ROLLING && userPunched.value && opponentPunched.value) {
 			scheduleResult()
 		}
 	}
@@ -296,10 +312,10 @@
 			return
 		}
 		rollingTimer = setInterval(() => {
-			if (opponentRolling.value) {
+			if (opponentPunched.value) {
 				gestureIndexTop.value = (gestureIndexTop.value + 1) % gestures.length
 			}
-			if (userRolling.value) {
+			if (userPunched.value) {
 				gestureIndexBottom.value = (gestureIndexBottom.value + 1) % gestures.length
 			}
 		}, 100)
@@ -319,8 +335,6 @@
 			clearInterval(rollingTimer)
 			rollingTimer = null
 		}
-		userRolling.value = false
-		opponentRolling.value = false
 		winner.value = evaluateWinner(gestureIndexTop.value, gestureIndexBottom.value)
 		if (winner.value === 'red') {
 			scoreRed.value += 1
@@ -328,10 +342,7 @@
 		if (winner.value === 'blue') {
 			scoreBlue.value += 1
 		}
-		if (isMatchOver.value) {
-			matchOver.value = true
-		}
-		gamePhase.value = 'result'
+		gameState.value = isMatchOver.value ? GameState.ROUND_OVER : GameState.RESULT
 	}
 
 	const evaluateWinner = (top, bottom) => {
@@ -346,14 +357,13 @@
 	}
 
 	const resetRoundState = () => {
-		userReady.value = false
-		opponentReady.value = false
-		userRolling.value = false
-		opponentRolling.value = false
+		countdown.value = 0
+		userPunched.value = false
+		opponentPunched.value = false
 		gestureIndexTop.value = 0
 		gestureIndexBottom.value = 0
 		winner.value = 'draw'
-		gamePhase.value = 'idle'
+		gameState.value = GameState.READY
 		if (rollingTimer) {
 			clearInterval(rollingTimer)
 			rollingTimer = null
@@ -367,7 +377,6 @@
 	const resetMatchState = () => {
 		scoreRed.value = 0
 		scoreBlue.value = 0
-		matchOver.value = false
 		resetRoundState()
 	}
 </script>
