@@ -17,6 +17,11 @@
 			<view class="main">
 				<view class="rps-game">
 					<view class="rps-grid"></view>
+					<view v-if="showScoreboard" class="rps-score">
+						<text class="rps-score-top">{{ scoreRed }}</text>
+						<text class="rps-score-vs">VS</text>
+						<text class="rps-score-bottom">{{ scoreBlue }}</text>
+					</view>
 					<view class="player-wrap player-wrap-top">
 						<view class="player-rotate">
 							<view class="player-section">
@@ -70,8 +75,8 @@
 								<text class="result-text" :class="resultTextClass">{{ resultText }}</text>
 							</view>
 						</view>
-						<view class="next-btn" @tap="handleStart">
-							<text class="next-btn-text">下一局</text>
+						<view class="next-btn" @tap="handleNextRound">
+							<text class="next-btn-text">{{ nextRoundText }}</text>
 						</view>
 					</view>
 				</view>
@@ -82,6 +87,7 @@
 
 <script setup>
 	import { computed, onMounted, onUnmounted, ref } from 'vue'
+	import { onLoad } from '@dcloudio/uni-app'
 
 	const backgroundImage = '/static/assets/rps/background.jpg'
 	const noiseImage = '/static/assets/rps/noise.png'
@@ -92,6 +98,11 @@
 	const isCounting = ref(false)
 	const countdown = ref(3)
 	const gamePhase = ref('idle')
+	const matchMode = ref('single')
+	const winTarget = ref(1)
+	const scoreRed = ref(0)
+	const scoreBlue = ref(0)
+	const matchOver = ref(false)
 	const userReady = ref(false)
 	const opponentReady = ref(false)
 	const userRolling = ref(false)
@@ -108,6 +119,20 @@
 		uni.navigateBack({
 			delta: 1
 		})
+	}
+
+	const applyMatchMode = (mode) => {
+		if (mode === 'bo3') {
+			matchMode.value = 'bo3'
+			winTarget.value = 2
+		} else if (mode === 'bo5') {
+			matchMode.value = 'bo5'
+			winTarget.value = 3
+		} else {
+			matchMode.value = 'single'
+			winTarget.value = 1
+		}
+		resetMatchState()
 	}
 
 	const setNavActionStyle = () => {
@@ -149,6 +174,12 @@
 		setNavActionStyle()
 	})
 
+	onLoad((query) => {
+		if (query?.mode) {
+			applyMatchMode(query.mode)
+		}
+	})
+
 	onUnmounted(() => {
 		if (countdownTimer) {
 			clearInterval(countdownTimer)
@@ -166,11 +197,18 @@
 
 	const isPulsing = computed(() => ['counting', 'ready', 'rolling'].includes(gamePhase.value))
 	const isRoundActive = computed(() => ['counting', 'ready', 'rolling'].includes(gamePhase.value))
+	const showScoreboard = computed(() => matchMode.value !== 'single')
 	const showPunchHint = computed(() => isRoundActive.value && !userReady.value)
 	const showStart = computed(() => !isCounting.value && gamePhase.value === 'idle')
 	const showPunchHintTop = computed(() => isRoundActive.value && !opponentReady.value)
 	const topGesture = computed(() => gestures[gestureIndexTop.value])
 	const bottomGesture = computed(() => gestures[gestureIndexBottom.value])
+	const nextRoundText = computed(() => {
+		if (showScoreboard.value && matchOver.value) {
+			return '开始下一轮'
+		}
+		return '下一局'
+	})
 	const resultText = computed(() => {
 		if (winner.value === 'blue') return '蓝方胜'
 		if (winner.value === 'red') return '红方胜'
@@ -185,6 +223,12 @@
 		if (winner.value === 'blue') return 'text-blue'
 		if (winner.value === 'red') return 'text-red'
 		return 'text-draw'
+	})
+	const isMatchOver = computed(() => {
+		if (!showScoreboard.value) {
+			return false
+		}
+		return scoreRed.value >= winTarget.value || scoreBlue.value >= winTarget.value
 	})
 
 	const handleStart = () => {
@@ -210,6 +254,15 @@
 				}, 500)
 			}
 		}, 1000)
+	}
+
+	const handleNextRound = () => {
+		if (showScoreboard.value && matchOver.value) {
+			resetMatchState()
+			handleStart()
+			return
+		}
+		handleStart()
 	}
 
 	const handlePunch = (role) => {
@@ -269,6 +322,15 @@
 		userRolling.value = false
 		opponentRolling.value = false
 		winner.value = evaluateWinner(gestureIndexTop.value, gestureIndexBottom.value)
+		if (winner.value === 'red') {
+			scoreRed.value += 1
+		}
+		if (winner.value === 'blue') {
+			scoreBlue.value += 1
+		}
+		if (isMatchOver.value) {
+			matchOver.value = true
+		}
 		gamePhase.value = 'result'
 	}
 
@@ -300,6 +362,13 @@
 			clearTimeout(resultTimer)
 			resultTimer = null
 		}
+	}
+
+	const resetMatchState = () => {
+		scoreRed.value = 0
+		scoreBlue.value = 0
+		matchOver.value = false
+		resetRoundState()
 	}
 </script>
 
@@ -416,6 +485,52 @@
 		opacity: 0.1;
 		background-image: linear-gradient(180deg, #333333 0.14925%, rgba(0, 0, 0, 0) 0.14925%),
 			linear-gradient(90deg, #333333 0.28958%, rgba(0, 0, 0, 0) 0.28958%);
+	}
+
+	.rps-score {
+		position: absolute;
+		top: 638.77rpx;
+		right: 23rpx;
+		width: 96rpx;
+		height: 192.66rpx;
+		padding: 17.33rpx 1.33rpx;
+		border-radius: 9999rpx;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1.33rpx solid rgba(255, 255, 255, 0.1);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8rpx;
+		transform: translateY(-50%);
+		box-sizing: border-box;
+	}
+
+	.rps-score-top,
+	.rps-score-bottom {
+		font-size: 40rpx;
+		line-height: 56rpx;
+		font-weight: 900;
+		text-align: center;
+		font-family: 'Arial Black', Arial, sans-serif;
+	}
+
+	.rps-score-top {
+		color: #fb2c36;
+	}
+
+	.rps-score-vs {
+		font-size: 20rpx;
+		line-height: 30rpx;
+		letter-spacing: 0;
+		font-weight: 700;
+		color: rgba(255, 255, 255, 0.2);
+		text-align: center;
+		text-transform: uppercase;
+		font-family: 'Arial Bold', Arial, sans-serif;
+	}
+
+	.rps-score-bottom {
+		color: #2b7fff;
 	}
 
 	.player-wrap {

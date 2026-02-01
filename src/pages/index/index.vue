@@ -32,17 +32,21 @@
 				</view>
 			</view>
 		</view>
+		<RpsModeModal ref="rpsModeModal" @select="handleRpsModeSelect" />
 		<SettingsModal ref="settingsModal" />
 	</view>
 </template>
 
 	<script setup>
 		import { onMounted, ref } from 'vue'
+		import RpsModeModal from '../../components/RpsModeModal.vue'
 		import SettingsModal from '../../components/SettingsModal.vue'
 
 		const backgroundImage = '/static/assets/party/background.jpg'
 		const noiseImage = '/static/assets/party/noise.png'
+		const rpsPath = '/pages/rps/index'
 		const settingsModal = ref(null)
+		const rpsModeModal = ref(null)
 		const navActionStyle = ref({})
 		const navTitleStyle = ref({})
 		const games = [{
@@ -76,8 +80,18 @@
 			console.log('[home] no path, skip navigate')
 			return
 		}
+		if (item.path === rpsPath) {
+			rpsModeModal.value?.open()
+			return
+		}
 		uni.navigateTo({
 			url: item.path
+		})
+	}
+
+	const handleRpsModeSelect = (mode) => {
+		uni.navigateTo({
+			url: `${rpsPath}?mode=${mode}`
 		})
 	}
 
