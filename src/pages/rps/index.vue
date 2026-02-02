@@ -68,6 +68,9 @@
 					<view v-else-if="gameState === GameState.COUNTING" class="countdown">
 						<text class="countdown-text">{{ countdown }}</text>
 					</view>
+					<view v-else-if="gameState === GameState.ROLLING" class="rolling">
+						<text class="rolling-text">出拳中...</text>
+					</view>
 					<view v-if="showResultPanel" class="result-panel">
 						<view class="result-banner" :class="resultClass">
 							<view class="result-banner-inner">
@@ -739,6 +742,27 @@
 		letter-spacing: 6rpx;
 		color: #ffffff;
 		text-shadow: 0 0 24rpx rgba(129, 140, 248, 0.6);
+	}
+	
+	.rolling {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 4;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 116.95rpx;
+	}
+
+	.rolling-text {
+		font-size: 48rpx;
+		line-height: 64rpx;
+		font-weight: 700;
+		letter-spacing: 3rpx;
+		color: #ffffff;
+		text-shadow: 0 0 20rpx rgba(139, 92, 246, 0.3);
 	}
 
 	.result-panel {
