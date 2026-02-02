@@ -288,7 +288,7 @@
 	}
 
 	const handlePunch = (role) => {
-		if (![GameState.COUNTING, GameState.ROLLING].includes(gameState.value)) {
+		if (gameState.value !== GameState.ROLLING) {
 			return
 		}
 		if (role === 'user') {
@@ -733,6 +733,7 @@
 		align-items: center;
 		justify-content: center;
 		z-index: 4;
+		pointer-events: none;
 	}
 
 	.countdown-text {
@@ -754,6 +755,7 @@
 		align-items: center;
 		justify-content: center;
 		height: 116.95rpx;
+		pointer-events: none;
 	}
 
 	.rolling-text {
@@ -864,6 +866,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		pointer-events: none;
 	}
 
 	.punch-hint-text {
