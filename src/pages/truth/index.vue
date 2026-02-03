@@ -41,26 +41,61 @@
 				</view>
 			</view>
 			</view>
-			<TruthPromptModal ref="truthModal" @closed="handlePromptClosed" />
-			<DarePromptModal ref="dareModal" @closed="handlePromptClosed" />
+			<TruthPromptModal ref="truthModal" :question="truthQuestion" @closed="handlePromptClosed" @refresh="handleTruthRefresh" />
+			<DarePromptModal ref="dareModal" :question="dareQuestion" @closed="handlePromptClosed" @refresh="handleDareRefresh" />
 		</view>
 	</template>
 
 	<script setup>
-		import { ref } from 'vue'
+		import { computed, ref } from 'vue'
+		import { onShow } from '@dcloudio/uni-app'
 		import TruthPromptModal from '../../components/TruthPromptModal.vue'
 		import DarePromptModal from '../../components/DarePromptModal.vue'
+		import promptData from '../../data/truth-dare.json'
 
 		const backgroundImage = '/static/assets/truth/background.jpg'
 		const noiseImage = '/static/assets/truth/noise.png'
 		const truthModal = ref(null)
 		const dareModal = ref(null)
+		const truthQuestion = ref('')
+		const dareQuestion = ref('')
+		const truthMode = ref('classic')
+		const storageKeys = {
+			truthMode: 'settings.truthMode'
+		}
 		const isChoiceVisible = ref(true)
 		const icons = {
 			back: '/static/assets/truth/icon-back.svg',
 			spark: '/static/assets/truth/icon-spark.svg',
 			heart: '/static/assets/truth/icon-heart.svg',
 			flame: '/static/assets/truth/icon-flame.svg'
+	}
+
+	const currentModeData = computed(() => {
+		return promptData[truthMode.value] || promptData.classic
+	})
+
+	const normalizeTruthMode = (mode) => {
+		if (promptData[mode]) {
+			return mode
+		}
+		return 'classic'
+	}
+
+	const pickRandom = (list) => {
+		if (!Array.isArray(list) || list.length === 0) {
+			return ''
+		}
+		const index = Math.floor(Math.random() * list.length)
+		return list[index]
+	}
+
+	const refreshTruthQuestion = () => {
+		truthQuestion.value = pickRandom(currentModeData.value.truths)
+	}
+
+	const refreshDareQuestion = () => {
+		dareQuestion.value = pickRandom(currentModeData.value.dares)
 	}
 
 	const handleBack = () => {
@@ -70,6 +105,7 @@
 	}
 
 	const handleTruth = () => {
+		refreshTruthQuestion()
 		isChoiceVisible.value = false
 		setTimeout(() => {
 			truthModal.value?.open()
@@ -77,15 +113,29 @@
 	}
 
 	const handleDare = () => {
+		refreshDareQuestion()
 		isChoiceVisible.value = false
 		setTimeout(() => {
 			dareModal.value?.open()
 		}, 150)
 	}
 
+	const handleTruthRefresh = () => {
+		refreshTruthQuestion()
+	}
+
+	const handleDareRefresh = () => {
+		refreshDareQuestion()
+	}
+
 	const handlePromptClosed = () => {
 		isChoiceVisible.value = true
 	}
+
+	onShow(() => {
+		const storedMode = uni.getStorageSync(storageKeys.truthMode)
+		truthMode.value = normalizeTruthMode(storedMode)
+	})
 </script>
 
 <style lang="scss">
