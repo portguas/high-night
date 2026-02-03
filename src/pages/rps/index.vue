@@ -117,6 +117,9 @@
 	const gestureIndexBottom = ref(1)
 	const winner = ref('draw')
 	const gestures = ['✊', '✌️', '🖐️']
+	const storageKeys = {
+		rpsMode: 'settings.rpsMode'
+	}
 	let countdownTimer = null
 	let rollingTimer = null
 	let resultTimer = null
@@ -139,6 +142,13 @@
 			winTarget.value = 1
 		}
 		resetMatchState()
+	}
+
+	const normalizeRpsMode = (mode) => {
+		if (mode === 'bo3' || mode === 'bo5' || mode === 'single') {
+			return mode
+		}
+		return 'single'
 	}
 
 	const setNavActionStyle = () => {
@@ -181,9 +191,9 @@
 	})
 
 	onLoad((query) => {
-		if (query?.mode) {
-			applyMatchMode(query.mode)
-		}
+		const storedMode = normalizeRpsMode(uni.getStorageSync(storageKeys.rpsMode))
+		const mode = normalizeRpsMode(query?.mode || storedMode)
+		applyMatchMode(mode)
 	})
 
 	onUnmounted(() => {
