@@ -46,7 +46,8 @@
 		const games = [{
 				title: '霓虹骰子',
 				desc: '经典聚会必备，比大小',
-				icon: '/static/assets/party/icon-dice.svg'
+				icon: '/static/assets/party/icon-dice.svg',
+				path: '/pages/dice/index'
 			},
 		{
 			title: '真心话大冒险',
