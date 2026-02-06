@@ -18,169 +18,13 @@
 			<view class="dice-layout__inner" :style="{ transform: `scale(${layoutScale})` }">
 				<view class="dice-stage">
 					<view class="dice-cluster" :class="{ 'is-revealed': isRevealed }">
-					<view class="dice dice--a">
-						<view class="dice__face">
-							<view class="dice__pip dice__pip--a1">
-								<view v-if="isDotVisible(diceValues[0], 0)" class="dice__dot"></view>
+						<view v-for="(value, index) in diceValues" :key="index" class="dice" :class="`dice--${getChar(index)}`">
+							<view class="dice__face">
+								<view v-for="pip in 9" :key="pip" class="dice__pip" :class="`pip-${pip - 1}`">
+									<view v-if="isDotVisible(value, pip - 1)" class="dice__dot" :class="{ 'is-big': value === 1 && pip === 5 }"></view>
+								</view>
+								<view class="dice__shine"></view>
 							</view>
-							<view class="dice__pip dice__pip--a2">
-								<view v-if="isDotVisible(diceValues[0], 1)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a3">
-								<view v-if="isDotVisible(diceValues[0], 2)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a4">
-								<view v-if="isDotVisible(diceValues[0], 3)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a5">
-								<view v-if="isDotVisible(diceValues[0], 4)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a6">
-								<view v-if="isDotVisible(diceValues[0], 5)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a7">
-								<view v-if="isDotVisible(diceValues[0], 6)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a8">
-								<view v-if="isDotVisible(diceValues[0], 7)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--a9">
-								<view v-if="isDotVisible(diceValues[0], 8)" class="dice__dot"></view>
-							</view>
-							<view class="dice__shine"></view>
-						</view>
-					</view>
-
-					<view class="dice dice--b">
-						<view class="dice__face">
-							<view class="dice__pip dice__pip--b1">
-								<view v-if="isDotVisible(diceValues[1], 0)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b2">
-								<view v-if="isDotVisible(diceValues[1], 1)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b3">
-								<view v-if="isDotVisible(diceValues[1], 2)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b4">
-								<view v-if="isDotVisible(diceValues[1], 3)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b5">
-								<view v-if="isDotVisible(diceValues[1], 4)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b6">
-								<view v-if="isDotVisible(diceValues[1], 5)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b7">
-								<view v-if="isDotVisible(diceValues[1], 6)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b8">
-								<view v-if="isDotVisible(diceValues[1], 7)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--b9">
-								<view v-if="isDotVisible(diceValues[1], 8)" class="dice__dot"></view>
-							</view>
-							<view class="dice__shine"></view>
-						</view>
-					</view>
-
-					<view class="dice dice--c">
-						<view class="dice__face">
-							<view class="dice__pip dice__pip--c1">
-								<view v-if="isDotVisible(diceValues[2], 0)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c2">
-								<view v-if="isDotVisible(diceValues[2], 1)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c3">
-								<view v-if="isDotVisible(diceValues[2], 2)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c4">
-								<view v-if="isDotVisible(diceValues[2], 3)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c5">
-								<view v-if="isDotVisible(diceValues[2], 4)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c6">
-								<view v-if="isDotVisible(diceValues[2], 5)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c7">
-								<view v-if="isDotVisible(diceValues[2], 6)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c8">
-								<view v-if="isDotVisible(diceValues[2], 7)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--c9">
-								<view v-if="isDotVisible(diceValues[2], 8)" class="dice__dot"></view>
-							</view>
-							<view class="dice__shine"></view>
-						</view>
-					</view>
-
-					<view class="dice dice--d">
-						<view class="dice__face">
-							<view class="dice__pip dice__pip--d1">
-								<view v-if="isDotVisible(diceValues[3], 0)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d2">
-								<view v-if="isDotVisible(diceValues[3], 1)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d3">
-								<view v-if="isDotVisible(diceValues[3], 2)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d4">
-								<view v-if="isDotVisible(diceValues[3], 3)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d5">
-								<view v-if="isDotVisible(diceValues[3], 4)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d6">
-								<view v-if="isDotVisible(diceValues[3], 5)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d7">
-								<view v-if="isDotVisible(diceValues[3], 6)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d8">
-								<view v-if="isDotVisible(diceValues[3], 7)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--d9">
-								<view v-if="isDotVisible(diceValues[3], 8)" class="dice__dot"></view>
-							</view>
-							<view class="dice__shine"></view>
-						</view>
-					</view>
-
-					<view class="dice dice--e">
-						<view class="dice__face">
-							<view class="dice__pip dice__pip--e1">
-								<view v-if="isDotVisible(diceValues[4], 0)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e2">
-								<view v-if="isDotVisible(diceValues[4], 1)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e3">
-								<view v-if="isDotVisible(diceValues[4], 2)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e4">
-								<view v-if="isDotVisible(diceValues[4], 3)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e5">
-								<view v-if="isDotVisible(diceValues[4], 4)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e6">
-								<view v-if="isDotVisible(diceValues[4], 5)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e7">
-								<view v-if="isDotVisible(diceValues[4], 6)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e8">
-								<view v-if="isDotVisible(diceValues[4], 7)" class="dice__dot"></view>
-							</view>
-							<view class="dice__pip dice__pip--e9">
-								<view v-if="isDotVisible(diceValues[4], 8)" class="dice__dot"></view>
-							</view>
-							<view class="dice__shine"></view>
-						</view>
 						</view>
 					</view>
 
@@ -216,7 +60,11 @@
 
 				<view class="dice-actions">
 					<view class="dice-actions__primary" :class="{ 'is-disabled': isShaking }" @tap="handleShake">
-						<text class="dice-actions__primary-text">SHAKE</text>
+						<template v-if="isShaking">
+							<image class="dice-actions__loading-icon spin" src="/static/assets/party/icon-dice.svg" mode="aspectFit" />
+							<text class="dice-actions__primary-text">Shaking</text>
+						</template>
+						<text v-else class="dice-actions__primary-text">SHAKE</text>
 					</view>
 					<view class="dice-actions__secondary" @tap="handleSettings">
 						<image class="dice-actions__icon" :src="gearIcon" mode="aspectFit" />
@@ -236,7 +84,7 @@
 	const crownBase = '/static/assets/dice/crown-base.svg'
 	const gearIcon = '/static/assets/dice/icon-gear.svg'
 	const backIcon = '/static/assets/rps/icon-back.svg'
-	const diceSound = '/static/assets/party/dice-shake.wav'
+	const diceSound = '/static/assets/party/dice-shake.mp3'
 	const navActionStyle = ref({})
 	const layoutScale = ref(1)
 	const isShaking = ref(false)
@@ -254,7 +102,8 @@
 
 	const storageKeys = {
 		soundEnabled: 'settings.soundEnabled',
-		hapticEnabled: 'settings.hapticEnabled'
+		hapticEnabled: 'settings.hapticEnabled',
+		diceCount: 'settings.diceCount'
 	}
 
 	const dotMap = {
@@ -268,7 +117,9 @@
 
 	const toRpx = (px) => px * rpxRatio.value
 	const cupLiftPx = 250
-	const cupThresholdPx = 100
+	const cupThresholdPx = 60
+	
+	const getChar = (index) => ['a', 'b', 'c', 'd', 'e'][index]
 
 	const isRevealed = computed(() => cupOpen.value || cupOffset.value <= -toRpx(cupThresholdPx))
 
@@ -310,11 +161,18 @@
 	const loadSettings = () => {
 		const soundValue = uni.getStorageSync(storageKeys.soundEnabled)
 		const hapticValue = uni.getStorageSync(storageKeys.hapticEnabled)
+		const diceCountValue = uni.getStorageSync(storageKeys.diceCount)
+		
 		if (typeof soundValue === 'boolean') {
 			soundEnabled.value = soundValue
 		}
 		if (typeof hapticValue === 'boolean') {
 			hapticEnabled.value = hapticValue
+		}
+		
+		const count = (diceCountValue && diceCountValue >= 1 && diceCountValue <= 5) ? diceCountValue : 5
+		if (diceValues.value.length !== count) {
+			diceValues.value = Array(count).fill(1).map(() => Math.floor(Math.random() * 6) + 1)
 		}
 	}
 
@@ -510,6 +368,25 @@
 		@return $px * $scale * 1rpx;
 	}
 
+	@keyframes spin {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.spin {
+		animation: spin 1s linear infinite;
+	}
+
+	.dice-actions__loading-icon {
+		width: r(40);
+		height: r(40);
+		margin-right: r(16);
+	}
+
 	.dice-page {
 		background: #0a0a0f;
 		box-sizing: border-box;
@@ -621,7 +498,7 @@
 		left: 50%;
 		opacity: 0;
 		position: absolute;
-		top: 50%;
+		top: r(460);
 		transform: translate(-50%, -50%) scale(0.98);
 		transition: opacity 0.3s ease, transform 0.3s ease;
 		width: r(240);
@@ -672,6 +549,31 @@
 		top: 0;
 	}
 
+	.dice__pip {
+		align-items: center;
+		display: flex;
+		justify-content: center;
+		position: absolute;
+		width: 20%;
+		height: 20%;
+	}
+
+	.pip-0 { left: 10%; top: 10%; }
+	.pip-1 { left: 40%; top: 10%; }
+	.pip-2 { left: 70%; top: 10%; }
+	.pip-3 { left: 10%; top: 40%; }
+	.pip-4 { left: 40%; top: 40%; }
+	.pip-5 { left: 70%; top: 40%; }
+	.pip-6 { left: 10%; top: 70%; }
+	.pip-7 { left: 40%; top: 70%; }
+	.pip-8 { left: 70%; top: 70%; }
+
+	.dice__dot.is-big {
+		background: #ff3333;
+		transform: scale(1.6);
+		box-shadow: inset 0 0 r(4) rgba(0,0,0,0.1);
+	}
+
 	.dice--a {
 		height: r(61.823);
 		left: r(20.83);
@@ -683,56 +585,6 @@
 	.dice--a .dice__face {
 		height: r(54.475);
 		width: r(54.475);
-	}
-
-	.dice--a .dice__pip {
-		height: r(9.079);
-		width: r(9.079);
-	}
-
-	.dice__pip--a1 {
-		left: r(12.57);
-		top: r(9.08);
-	}
-
-	.dice__pip--a2 {
-		left: r(20.49);
-		top: r(10.24);
-	}
-
-	.dice__pip--a3 {
-		left: r(28.4);
-		top: r(11.41);
-	}
-
-	.dice__pip--a4 {
-		left: r(36.32);
-		top: r(12.57);
-	}
-
-	.dice__pip--a5 {
-		left: r(10.83);
-		top: r(20.95);
-	}
-
-	.dice__pip--a6 {
-		left: r(18.74);
-		top: r(22.12);
-	}
-
-	.dice__pip--a7 {
-		left: r(26.66);
-		top: r(23.28);
-	}
-
-	.dice__pip--a8 {
-		left: r(34.57);
-		top: r(24.44);
-	}
-
-	.dice__pip--a9 {
-		left: r(9.08);
-		top: r(32.82);
 	}
 
 	.dice--b {
@@ -748,56 +600,6 @@
 		width: r(52.781);
 	}
 
-	.dice--b .dice__pip {
-		height: r(8.797);
-		width: r(8.797);
-	}
-
-	.dice__pip--b1 {
-		left: r(11.32);
-		top: r(8.8);
-	}
-
-	.dice__pip--b2 {
-		left: r(19.28);
-		top: r(9.64);
-	}
-
-	.dice__pip--b3 {
-		left: r(27.23);
-		top: r(10.48);
-	}
-
-	.dice__pip--b4 {
-		left: r(35.19);
-		top: r(11.32);
-	}
-
-	.dice__pip--b5 {
-		left: r(10.06);
-		top: r(20.73);
-	}
-
-	.dice__pip--b6 {
-		left: r(18.01);
-		top: r(21.57);
-	}
-
-	.dice__pip--b7 {
-		left: r(25.97);
-		top: r(22.41);
-	}
-
-	.dice__pip--b8 {
-		left: r(33.93);
-		top: r(23.25);
-	}
-
-	.dice__pip--b9 {
-		left: r(8.8);
-		top: r(32.66);
-	}
-
 	.dice--c {
 		height: r(52.826);
 		left: r(156.29);
@@ -809,56 +611,6 @@
 	.dice--c .dice__face {
 		height: r(50.355);
 		width: r(50.355);
-	}
-
-	.dice--c .dice__pip {
-		height: r(8.393);
-		width: r(8.393);
-	}
-
-	.dice__pip--c1 {
-		left: r(9.6);
-		top: r(8.39);
-	}
-
-	.dice__pip--c2 {
-		left: r(17.59);
-		top: r(8.8);
-	}
-
-	.dice__pip--c3 {
-		left: r(25.58);
-		top: r(9.2);
-	}
-
-	.dice__pip--c4 {
-		left: r(33.57);
-		top: r(9.6);
-	}
-
-	.dice__pip--c5 {
-		left: r(9);
-		top: r(20.38);
-	}
-
-	.dice__pip--c6 {
-		left: r(16.99);
-		top: r(20.78);
-	}
-
-	.dice__pip--c7 {
-		left: r(24.98);
-		top: r(21.18);
-	}
-
-	.dice__pip--c8 {
-		left: r(32.97);
-		top: r(21.59);
-	}
-
-	.dice__pip--c9 {
-		left: r(8.39);
-		top: r(32.36);
 	}
 
 	.dice--d {
@@ -874,56 +626,6 @@
 		width: r(49.503);
 	}
 
-	.dice--d .dice__pip {
-		height: r(8.25);
-		width: r(8.25);
-	}
-
-	.dice__pip--d1 {
-		left: r(8.25);
-		top: r(9.01);
-	}
-
-	.dice__pip--d2 {
-		left: r(16.25);
-		top: r(8.76);
-	}
-
-	.dice__pip--d3 {
-		left: r(24.24);
-		top: r(8.51);
-	}
-
-	.dice__pip--d4 {
-		left: r(32.24);
-		top: r(8.25);
-	}
-
-	.dice__pip--d5 {
-		left: r(8.63);
-		top: r(21.01);
-	}
-
-	.dice__pip--d6 {
-		left: r(16.63);
-		top: r(20.75);
-	}
-
-	.dice__pip--d7 {
-		left: r(24.62);
-		top: r(20.5);
-	}
-
-	.dice__pip--d8 {
-		left: r(32.62);
-		top: r(20.24);
-	}
-
-	.dice__pip--d9 {
-		left: r(9.01);
-		top: r(33);
-	}
-
 	.dice--e {
 		height: r(71.905);
 		left: r(90.63);
@@ -937,61 +639,11 @@
 		width: r(58.749);
 	}
 
-	.dice--e .dice__pip {
-		height: r(9.791);
-		width: r(9.791);
-	}
-
-	.dice__pip--e1 {
-		left: r(9.79);
-		top: r(15.98);
-	}
-
-	.dice__pip--e2 {
-		left: r(17.52);
-		top: r(13.91);
-	}
-
-	.dice__pip--e3 {
-		left: r(25.25);
-		top: r(11.85);
-	}
-
-	.dice__pip--e4 {
-		left: r(32.98);
-		top: r(9.79);
-	}
-
-	.dice__pip--e5 {
-		left: r(12.88);
-		top: r(27.57);
-	}
-
-	.dice__pip--e6 {
-		left: r(20.61);
-		top: r(25.51);
-	}
-
-	.dice__pip--e7 {
-		left: r(28.34);
-		top: r(23.45);
-	}
-
-	.dice__pip--e8 {
-		left: r(36.07);
-		top: r(21.39);
-	}
-
-	.dice__pip--e9 {
-		left: r(15.98);
-		top: r(39.17);
-	}
-
 	.dice-cup {
 		height: r(288);
 		left: r(68.67);
 		position: absolute;
-		top: r(176);
+		top: r(220);
 		width: r(256);
 		z-index: 2;
 	}
