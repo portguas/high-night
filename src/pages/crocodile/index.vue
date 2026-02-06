@@ -107,18 +107,33 @@
 </template>
 
 <script setup>
-	import { computed, nextTick, onMounted, ref } from 'vue'
+	import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+	import { onShow } from '@dcloudio/uni-app'
 
 	const backgroundImage = '/static/assets/crocodile/background.jpg'
 	const noiseImage = '/static/assets/crocodile/noise.png'
 	const backIcon = '/static/assets/crocodile/icon-back.svg'
-		const navActionStyle = ref({})
-		const navTitleStyle = ref({})
-		const isBlinking = ref(false)
-		const isMouthClosing = ref(false)
-		const isGameOver = ref(false)
-		let blinkTimer = null
-		let gameOverTimer = null
+	const clickSound = '/static/assets/crocodile/croco-click.mp3'
+	const biteSound = '/static/assets/crocodile/croco-bite.mp3'
+
+	const navActionStyle = ref({})
+	const navTitleStyle = ref({})
+	const isBlinking = ref(false)
+	const isMouthClosing = ref(false)
+	const isGameOver = ref(false)
+	const soundEnabled = ref(true)
+	const hapticEnabled = ref(true)
+
+	let blinkTimer = null
+	let gameOverTimer = null
+	let clickAudio = null
+	let biteAudio = null
+
+	const storageKeys = {
+		soundEnabled: 'settings.soundEnabled',
+		hapticEnabled: 'settings.hapticEnabled'
+	}
+
 	const teeth = ref(
 		Array.from({ length: 10 }, (_, index) => {
 			const side = index < 5 ? 'left' : 'right'
@@ -132,6 +147,61 @@
 		})
 	)
 	const badToothId = ref('')
+
+	const loadSettings = () => {
+		const soundValue = uni.getStorageSync(storageKeys.soundEnabled)
+		const hapticValue = uni.getStorageSync(storageKeys.hapticEnabled)
+		if (typeof soundValue === 'boolean') {
+			soundEnabled.value = soundValue
+		}
+		if (typeof hapticValue === 'boolean') {
+			hapticEnabled.value = hapticValue
+		}
+	}
+
+	const initAudio = () => {
+		try {
+			clickAudio = uni.createInnerAudioContext()
+			clickAudio.src = clickSound
+			biteAudio = uni.createInnerAudioContext()
+			biteAudio.src = biteSound
+		} catch (error) {
+			console.error('Failed to init audio:', error)
+		}
+	}
+
+	const destroyAudio = () => {
+		if (clickAudio) {
+			clickAudio.destroy()
+			clickAudio = null
+		}
+		if (biteAudio) {
+			biteAudio.destroy()
+			biteAudio = null
+		}
+	}
+
+	const playClickSound = () => {
+		if (soundEnabled.value && clickAudio) {
+			clickAudio.seek(0)
+			clickAudio.play()
+		}
+	}
+
+	const playBiteSound = () => {
+		if (soundEnabled.value && biteAudio) {
+			biteAudio.seek(0)
+			biteAudio.play()
+		}
+	}
+
+	const triggerHaptic = () => {
+		if (hapticEnabled.value) {
+			uni.vibrateShort({
+				type: 'light'
+			})
+		}
+	}
 
 	const handleBack = () => {
 		uni.navigateBack({
@@ -150,9 +220,12 @@
 			return
 		}
 		tooth.pressed = true
+		triggerHaptic()
+
 		if (tooth.id === badToothId.value) {
 			tooth.state = 'hit'
 			isMouthClosing.value = true
+			playBiteSound()
 			if (gameOverTimer) {
 				clearTimeout(gameOverTimer)
 			}
@@ -162,8 +235,10 @@
 			}, 420)
 			return
 		}
+
 		tooth.state = 'miss'
 		tooth.pulse = true
+		playClickSound()
 		triggerBlink()
 		setTimeout(() => {
 			tooth.pulse = false
@@ -238,8 +313,20 @@
 
 	onMounted(() => {
 		setNavActionStyle()
+		loadSettings()
+		initAudio()
 		const randomIndex = Math.floor(Math.random() * teeth.value.length)
 		badToothId.value = teeth.value[randomIndex]?.id || ''
+	})
+
+	onShow(() => {
+		loadSettings()
+	})
+
+	onUnmounted(() => {
+		destroyAudio()
+		if (blinkTimer) clearTimeout(blinkTimer)
+		if (gameOverTimer) clearTimeout(gameOverTimer)
 	})
 </script>
 
