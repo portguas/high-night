@@ -85,21 +85,6 @@
 
 				<view class="section">
 					<view class="section-header">
-						<text class="section-title">骰子数量</text>
-						<text class="section-hint">单选</text>
-					</view>
-					<radio-group class="radio-group" @change="handleDiceCountChange">
-						<label v-for="item in diceCounts" :key="item.value" class="radio-item" :class="{ 'is-active': diceCount === item.value }">
-							<view class="radio-text">
-								<text class="radio-title">{{ item.label }}</text>
-							</view>
-							<radio :value="String(item.value)" :checked="diceCount === item.value" color="#155dfc" />
-						</label>
-					</radio-group>
-				</view>
-
-				<view class="section">
-					<view class="section-header">
 						<text class="section-title">石头剪刀布模式</text>
 						<text class="section-hint">单选</text>
 					</view>
@@ -148,15 +133,13 @@
 		soundEnabled: 'settings.soundEnabled',
 		hapticEnabled: 'settings.hapticEnabled',
 		rpsMode: 'settings.rpsMode',
-		truthMode: 'settings.truthMode',
-		diceCount: 'settings.diceCount'
+		truthMode: 'settings.truthMode'
 	}
 
 	const soundEnabled = ref(true)
 	const hapticEnabled = ref(true)
 	const rpsMode = ref('single')
 	const truthMode = ref('classic')
-	const diceCount = ref(5)
 
 	const rpsModes = [
 		{
@@ -192,14 +175,6 @@
 		}
 	]
 
-	const diceCounts = [
-		{ value: 1, label: '1个骰子' },
-		{ value: 2, label: '2个骰子' },
-		{ value: 3, label: '3个骰子' },
-		{ value: 4, label: '4个骰子' },
-		{ value: 5, label: '5个骰子' }
-	]
-
 	const icons = {
 		sound1: '/static/assets/settings/icon-sound-1.png',
 		haptic1: '/static/assets/settings/icon-touch.png',
@@ -212,7 +187,6 @@
 		const hapticValue = uni.getStorageSync(storageKeys.hapticEnabled)
 		const storedRpsMode = uni.getStorageSync(storageKeys.rpsMode)
 		const storedTruthMode = uni.getStorageSync(storageKeys.truthMode)
-		const storedDiceCount = uni.getStorageSync(storageKeys.diceCount)
 
 		if (typeof soundValue === 'boolean') {
 			soundEnabled.value = soundValue
@@ -226,9 +200,6 @@
 		if (storedTruthMode && truthModes.some((item) => item.value === storedTruthMode)) {
 			truthMode.value = storedTruthMode
 		}
-		if (storedDiceCount && diceCounts.some((item) => item.value === storedDiceCount)) {
-			diceCount.value = storedDiceCount
-		}
 	}
 
 	const saveSetting = (key, value) => {
@@ -240,7 +211,6 @@
 		hapticEnabled.value = true
 		rpsMode.value = 'single'
 		truthMode.value = 'classic'
-		diceCount.value = 5
 	}
 
 	const handleBack = () => {
@@ -257,14 +227,6 @@
 	const toggleHaptic = () => {
 		hapticEnabled.value = !hapticEnabled.value
 		saveSetting(storageKeys.hapticEnabled, hapticEnabled.value)
-	}
-
-	const handleDiceCountChange = (event) => {
-		const value = Number(event.detail.value)
-		if (diceCounts.some((item) => item.value === value)) {
-			diceCount.value = value
-			saveSetting(storageKeys.diceCount, value)
-		}
 	}
 
 	const handleRpsModeChange = (event) => {

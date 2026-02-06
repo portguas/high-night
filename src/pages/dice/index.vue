@@ -66,8 +66,28 @@
 						</template>
 						<text v-else class="dice-actions__primary-text">SHAKE</text>
 					</view>
-					<view class="dice-actions__secondary" @tap="handleSettings">
-						<image class="dice-actions__icon" :src="gearIcon" mode="aspectFit" />
+					<view class="dice-actions__secondary" @tap="handleDiceSelector">
+						<image class="dice-actions__icon" :src="diceIcon" mode="aspectFit" />
+						<view class="dice-count-badge">{{ diceValues.length }}</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<view class="dice-selector-mask" :class="{ 'is-visible': showDiceSelector }" @tap="closeDiceSelector">
+			<view class="dice-selector-panel" :class="{ 'is-visible': showDiceSelector }" @tap.stop>
+				<view class="selector-header">
+					<text class="selector-title">选择骰子数量</text>
+				</view>
+				<view class="selector-options">
+					<view 
+						v-for="num in diceSelectorOptions" 
+						:key="num" 
+						class="selector-option"
+						:class="{ 'is-active': diceValues.length === num }"
+						@tap="handleSelectDiceCount(num)"
+					>
+						<text class="option-text">{{ num }}</text>
 					</view>
 				</view>
 			</view>
@@ -83,6 +103,7 @@
 	const crownTop = '/static/assets/dice/crown-top.svg'
 	const crownBase = '/static/assets/dice/crown-base.svg'
 	const gearIcon = '/static/assets/dice/icon-gear.svg'
+	const diceIcon = '/static/assets/party/icon-dice.svg'
 	const backIcon = '/static/assets/rps/icon-back.svg'
 	const diceSound = '/static/assets/party/dice-shake.mp3'
 	const navActionStyle = ref({})
@@ -97,6 +118,8 @@
 	const hapticEnabled = ref(true)
 	const diceValues = ref([1, 1, 1, 1, 1])
 	const rpxRatio = ref(750 / 393.333)
+	const showDiceSelector = ref(false)
+	const diceSelectorOptions = [1, 2, 3, 4, 5]
 	let shakeTimer = null
 	let diceAudio = null
 
@@ -306,13 +329,31 @@
 		}, 600)
 	}
 
-	const handleSettings = async () => {
-		try {
-			await uni.navigateTo({
-				url: '/pages/settings/index'
-			})
-		} catch (error) {
+	const handleDiceSelector = () => {
+		if (isShaking.value) return
+		showDiceSelector.value = true
+	}
+
+	const closeDiceSelector = () => {
+		showDiceSelector.value = false
+	}
+
+	const handleSelectDiceCount = (count) => {
+		if (diceValues.value.length === count) {
+			closeDiceSelector()
+			return
 		}
+		
+		diceValues.value = Array(count).fill(1).map(() => Math.floor(Math.random() * 6) + 1)
+		uni.setStorageSync(storageKeys.diceCount, count)
+		
+		closeDiceSelector()
+		
+		uni.showToast({
+			title: `${count}个骰子`,
+			icon: 'none',
+			duration: 1500
+		})
 	}
 
 	const handleCupTouchStart = (event) => {
@@ -498,7 +539,7 @@
 		left: 50%;
 		opacity: 0;
 		position: absolute;
-		top: r(460);
+		top: r(430);
 		transform: translate(-50%, -50%) scale(0.98);
 		transition: opacity 0.3s ease, transform 0.3s ease;
 		width: r(240);
@@ -833,7 +874,98 @@
 		display: flex;
 		height: r(64);
 		justify-content: center;
+		position: relative;
 		width: r(64);
+	}
+
+	.dice-count-badge {
+		position: absolute;
+		bottom: r(-8);
+		right: r(-8);
+		background: #155dfc;
+		color: #ffffff;
+		font-size: r(12);
+		font-weight: 700;
+		min-width: r(24);
+		height: r(24);
+		border-radius: 999px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 2rpx solid #0a0a0f;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	}
+
+	.dice-selector-mask {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		z-index: 100;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s ease;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+	}
+
+	.dice-selector-mask.is-visible {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.dice-selector-panel {
+		background: #1a1a20;
+		border-top-left-radius: r(32);
+		border-top-right-radius: r(32);
+		padding: r(32) r(24) calc(env(safe-area-inset-bottom) + r(32));
+		transform: translateY(100%);
+		transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+
+	.dice-selector-panel.is-visible {
+		transform: translateY(0);
+	}
+
+	.selector-header {
+		display: flex;
+		justify-content: center;
+		margin-bottom: r(32);
+	}
+
+	.selector-title {
+		color: #ffffff;
+		font-size: r(32);
+		font-weight: 700;
+	}
+
+	.selector-options {
+		display: flex;
+		justify-content: space-between;
+		gap: r(16);
+	}
+
+	.selector-option {
+		flex: 1;
+		height: r(100);
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: r(20);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 2rpx solid transparent;
+		transition: all 0.2s ease;
+	}
+
+	.selector-option.is-active {
+		background: rgba(21, 93, 252, 0.2);
+		border-color: #155dfc;
+	}
+
+	.option-text {
+		color: #ffffff;
+		font-size: r(36);
+		font-weight: 700;
 	}
 
 	.dice-actions__icon {
