@@ -122,6 +122,8 @@
 <script setup>
 	import { onMounted, ref } from 'vue'
 	import { onShow } from '@dcloudio/uni-app'
+	import uma from 'umtrack-wx'
+	import { TrackEvents } from '@/utils/tracker'
 
 	const backgroundImage = '/static/assets/party/background.jpg'
 	const noiseImage = '/static/assets/party/noise.png'
@@ -222,11 +224,13 @@
 	const toggleSound = () => {
 		soundEnabled.value = !soundEnabled.value
 		saveSetting(storageKeys.soundEnabled, soundEnabled.value)
+		uma.trackEvent(TrackEvents.SETTINGS_TOGGLE_SOUND, { enabled: soundEnabled.value })
 	}
 
 	const toggleHaptic = () => {
 		hapticEnabled.value = !hapticEnabled.value
 		saveSetting(storageKeys.hapticEnabled, hapticEnabled.value)
+		uma.trackEvent(TrackEvents.SETTINGS_TOGGLE_HAPTIC, { enabled: hapticEnabled.value })
 	}
 
 	const handleRpsModeChange = (event) => {
@@ -234,6 +238,7 @@
 		if (rpsModes.some((item) => item.value === value)) {
 			rpsMode.value = value
 			saveSetting(storageKeys.rpsMode, value)
+			uma.trackEvent(TrackEvents.RPS_CHANGE_MODE, { mode: value })
 		}
 	}
 
@@ -242,10 +247,12 @@
 		if (truthModes.some((item) => item.value === value)) {
 			truthMode.value = value
 			saveSetting(storageKeys.truthMode, value)
+			uma.trackEvent(TrackEvents.TRUTH_CHANGE_MODE, { mode: value })
 		}
 	}
 
 	const handleClearCache = () => {
+		uma.trackEvent(TrackEvents.SETTINGS_CLEAR_CACHE)
 		Object.values(storageKeys).forEach((key) => {
 			uni.removeStorageSync(key)
 		})
@@ -297,6 +304,7 @@
 
 	onShow(() => {
 		loadSettings()
+		uma.trackEvent(TrackEvents.PAGE_VIEW_SETTINGS)
 	})
 </script>
 

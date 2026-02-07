@@ -98,6 +98,8 @@
 <script setup>
 	import { computed, onMounted, onUnmounted, ref } from 'vue'
 	import { onShow } from '@dcloudio/uni-app'
+	import uma from 'umtrack-wx'
+	import { TrackEvents } from '@/utils/tracker'
 
 	const atmosphereImage = '/static/assets/dice/atmosphere.png'
 	const crownTop = '/static/assets/dice/crown-top.svg'
@@ -241,6 +243,8 @@
 
 	const rollDice = () => {
 		diceValues.value = diceValues.value.map(() => Math.floor(Math.random() * 6) + 1)
+		const total = diceValues.value.reduce((a, b) => a + b, 0)
+		uma.trackEvent(TrackEvents.DICE_SHAKE_RESULT, { total_points: total })
 	}
 
 	const isDotVisible = (value, index) => {
@@ -290,6 +294,7 @@
 
 	onShow(() => {
 		loadSettings()
+		uma.trackEvent(TrackEvents.PAGE_VIEW_DICE)
 	})
 
 	onUnmounted(() => {
@@ -314,6 +319,7 @@
 			return
 		}
 		isShaking.value = true
+		uma.trackEvent(TrackEvents.DICE_CLICK_SHAKE)
 		if (cupOpen.value || cupOffset.value < 0) {
 			closeCup()
 		}
@@ -332,6 +338,7 @@
 	const handleDiceSelector = () => {
 		if (isShaking.value) return
 		showDiceSelector.value = true
+		uma.trackEvent(TrackEvents.DICE_CLICK_SELECTOR)
 	}
 
 	const closeDiceSelector = () => {
@@ -339,6 +346,7 @@
 	}
 
 	const handleSelectDiceCount = (count) => {
+		uma.trackEvent(TrackEvents.DICE_SELECT_COUNT, { count })
 		if (diceValues.value.length === count) {
 			closeDiceSelector()
 			return

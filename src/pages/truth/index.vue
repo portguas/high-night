@@ -49,6 +49,8 @@
 	<script setup>
 		import { computed, ref } from 'vue'
 		import { onShow } from '@dcloudio/uni-app'
+		import uma from 'umtrack-wx'
+		import { TrackEvents } from '@/utils/tracker'
 		import TruthPromptModal from '../../components/TruthPromptModal.vue'
 		import DarePromptModal from '../../components/DarePromptModal.vue'
 		import promptData from '../../data/truth-dare.json'
@@ -105,6 +107,7 @@
 	}
 
 	const handleTruth = () => {
+		uma.trackEvent(TrackEvents.TRUTH_CLICK_TRUTH)
 		refreshTruthQuestion()
 		isChoiceVisible.value = false
 		setTimeout(() => {
@@ -113,6 +116,7 @@
 	}
 
 	const handleDare = () => {
+		uma.trackEvent(TrackEvents.TRUTH_CLICK_DARE)
 		refreshDareQuestion()
 		isChoiceVisible.value = false
 		setTimeout(() => {
@@ -121,10 +125,12 @@
 	}
 
 	const handleTruthRefresh = () => {
+		uma.trackEvent(TrackEvents.TRUTH_CLICK_TRUTH)
 		refreshTruthQuestion()
 	}
 
 	const handleDareRefresh = () => {
+		uma.trackEvent(TrackEvents.TRUTH_CLICK_DARE)
 		refreshDareQuestion()
 	}
 
@@ -133,6 +139,7 @@
 	}
 
 	onShow(() => {
+		uma.trackEvent(TrackEvents.PAGE_VIEW_TRUTH)
 		const storedMode = uni.getStorageSync(storageKeys.truthMode)
 		truthMode.value = normalizeTruthMode(storedMode)
 	})

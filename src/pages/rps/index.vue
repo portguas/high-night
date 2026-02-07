@@ -91,6 +91,8 @@
 <script setup>
 	import { computed, onMounted, onUnmounted, ref } from 'vue'
 	import { onLoad, onShow } from '@dcloudio/uni-app'
+	import uma from 'umtrack-wx'
+	import { TrackEvents } from '@/utils/tracker'
 
 	const backgroundImage = '/static/assets/rps/background.jpg'
 	const noiseImage = '/static/assets/rps/noise.png'
@@ -244,6 +246,7 @@
 
 	onShow(() => {
 		loadSettings()
+		uma.trackEvent(TrackEvents.PAGE_VIEW_RPS)
 	})
 
 	onLoad((query) => {
@@ -312,6 +315,7 @@
 		if (gameState.value === GameState.COUNTING) {
 			return
 		}
+		uma.trackEvent(TrackEvents.RPS_CLICK_START)
 		resetRoundState()
 		countdown.value = 3
 		gameState.value = GameState.COUNTING
@@ -338,6 +342,7 @@
 	}
 
 	const handleNextRound = () => {
+		uma.trackEvent(TrackEvents.RPS_CLICK_NEXT)
 		if (gameState.value === GameState.ROUND_OVER) {
 			resetMatchState()
 			handleStart()
@@ -362,12 +367,14 @@
 			if (userPunched.value) {
 				return
 			}
+			uma.trackEvent(TrackEvents.RPS_CLICK_PUNCH, { role: 'user' })
 			userPunched.value = true
 			advanceGesture(role)
 		} else {
 			if (opponentPunched.value) {
 				return
 			}
+			uma.trackEvent(TrackEvents.RPS_CLICK_PUNCH, { role: 'opponent' })
 			opponentPunched.value = true
 			advanceGesture(role)
 		}
@@ -414,6 +421,7 @@
 			scoreBlue.value += 1
 		}
 		gameState.value = isMatchOver.value ? GameState.ROUND_OVER : GameState.RESULT
+		uma.trackEvent(TrackEvents.RPS_GAME_RESULT, { winner: winner.value, mode: matchMode.value })
 		playSound('result')
 	}
 

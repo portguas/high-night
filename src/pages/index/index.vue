@@ -37,6 +37,9 @@
 
 	<script setup>
 		import { onMounted, ref } from 'vue'
+		import { onShow } from '@dcloudio/uni-app'
+		import uma from 'umtrack-wx'
+		import { TrackEvents } from '@/utils/tracker'
 
 		const backgroundImage = '/static/assets/party/background.jpg'
 		const noiseImage = '/static/assets/party/noise.png'
@@ -71,6 +74,7 @@
 
 	const handleGameClick = (item) => {
 		console.log('[home] tap game', item)
+		uma.trackEvent(TrackEvents.HOME_CLICK_GAME, { game_title: item.title })
 		if (!item.path) {
 			console.log('[home] no path, skip navigate')
 			return
@@ -81,6 +85,7 @@
 	}
 
 	const handleSettings = () => {
+		uma.trackEvent(TrackEvents.HOME_CLICK_SETTINGS)
 		uni.navigateTo({
 			url: settingsPath
 		})
@@ -123,6 +128,10 @@
 
 	onMounted(() => {
 		setNavActionStyle()
+	})
+
+	onShow(() => {
+		uma.trackEvent(TrackEvents.PAGE_VIEW_HOME)
 	})
 </script>
 

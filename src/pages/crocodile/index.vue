@@ -109,6 +109,8 @@
 <script setup>
 	import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 	import { onShow } from '@dcloudio/uni-app'
+	import uma from 'umtrack-wx'
+	import { TrackEvents } from '@/utils/tracker'
 
 	const backgroundImage = '/static/assets/crocodile/background.jpg'
 	const noiseImage = '/static/assets/crocodile/noise.png'
@@ -226,16 +228,19 @@
 			tooth.state = 'hit'
 			isMouthClosing.value = true
 			playBiteSound()
+			uma.trackEvent(TrackEvents.CROCODILE_CLICK_TOOTH, { tooth_id: tooth.id, is_bad: true })
 			if (gameOverTimer) {
 				clearTimeout(gameOverTimer)
 			}
 			gameOverTimer = setTimeout(() => {
 				isGameOver.value = true
+				uma.trackEvent(TrackEvents.CROCODILE_GAME_OVER)
 				gameOverTimer = null
 			}, 420)
 			return
 		}
 
+		uma.trackEvent(TrackEvents.CROCODILE_CLICK_TOOTH, { tooth_id: tooth.id, is_bad: false })
 		tooth.state = 'miss'
 		tooth.pulse = true
 		playClickSound()
@@ -261,6 +266,7 @@
 	}
 
 	const resetGame = () => {
+		uma.trackEvent(TrackEvents.CROCODILE_CLICK_RESET)
 		isGameOver.value = false
 		isMouthClosing.value = false
 		if (gameOverTimer) {
@@ -321,6 +327,7 @@
 
 	onShow(() => {
 		loadSettings()
+		uma.trackEvent(TrackEvents.PAGE_VIEW_CROCODILE)
 	})
 
 	onUnmounted(() => {
