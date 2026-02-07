@@ -8,7 +8,7 @@
 
 		<view class="content">
 			<view class="nav-title" :style="navTitleStyle">
-				<text class="nav-title-text">夜场游戏</text>
+				<text class="nav-title-text">醉会玩</text>
 			</view>
 			<view class="nav-action" :style="navActionStyle" @tap="handleSettings">
 				<uni-icons type="settings" size="24" color="rgba(255, 255, 255, 0.9)" />
