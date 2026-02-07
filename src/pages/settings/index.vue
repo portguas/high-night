@@ -69,17 +69,6 @@
 							</view>
 							<text class="setting-status">始终开启</text>
 						</view>
-
-						<view class="settings-divider"></view>
-
-						<view class="clear-button" @tap="handleClearCache">
-							<image class="clear-icon" :src="icons.trash" mode="aspectFit" />
-							<text class="clear-text">清除缓存数据</text>
-						</view>
-
-						<view class="settings-footer">
-							<text class="footer-text">VERSION 1.0.2 BETA</text>
-						</view>
 					</view>
 				</view>
 
