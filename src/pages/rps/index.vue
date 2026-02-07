@@ -90,12 +90,15 @@
 
 <script setup>
 	import { computed, onMounted, onUnmounted, ref } from 'vue'
-	import { onLoad } from '@dcloudio/uni-app'
+	import { onLoad, onShow } from '@dcloudio/uni-app'
 
 	const backgroundImage = '/static/assets/rps/background.jpg'
 	const noiseImage = '/static/assets/rps/noise.png'
 	const backIcon = '/static/assets/rps/icon-back.svg'
 	const resultIcon = '/static/assets/rps/icon-trophy.svg'
+	const tickSound = '/static/assets/rps/rps-trick.mp3'
+	const resultSound = '/static/assets/rps/rps-result.mp3'
+
 	const navActionStyle = ref({})
 	const navTitleStyle = ref({})
 	const countdown = ref(0)
@@ -117,17 +120,64 @@
 	const gestureIndexBottom = ref(1)
 	const winner = ref('draw')
 	const gestures = ['✊', '✌️', '🖐️']
+	const soundEnabled = ref(true)
+
 	const storageKeys = {
-		rpsMode: 'settings.rpsMode'
+		rpsMode: 'settings.rpsMode',
+		soundEnabled: 'settings.soundEnabled'
 	}
 	let countdownTimer = null
 	let rollingTimer = null
 	let resultTimer = null
+	let tickAudio = null
+	let resultAudio = null
 
 	const handleBack = () => {
 		uni.navigateBack({
 			delta: 1
 		})
+	}
+
+	const loadSettings = () => {
+		const soundValue = uni.getStorageSync(storageKeys.soundEnabled)
+		if (typeof soundValue === 'boolean') {
+			soundEnabled.value = soundValue
+		}
+	}
+
+	const initAudio = () => {
+		try {
+			tickAudio = uni.createInnerAudioContext()
+			tickAudio.src = tickSound
+			tickAudio.volume = 0.3
+			
+			resultAudio = uni.createInnerAudioContext()
+			resultAudio.src = resultSound
+			resultAudio.volume = 0.6
+		} catch (error) {
+			console.error('Failed to init audio:', error)
+		}
+	}
+
+	const destroyAudio = () => {
+		if (tickAudio) {
+			tickAudio.destroy()
+			tickAudio = null
+		}
+		if (resultAudio) {
+			resultAudio.destroy()
+			resultAudio = null
+		}
+	}
+
+	const playSound = (type) => {
+		if (!soundEnabled.value) return
+		
+		const audio = type === 'tick' ? tickAudio : resultAudio
+		if (audio) {
+			audio.stop()
+			audio.play()
+		}
 	}
 
 	const applyMatchMode = (mode) => {
@@ -188,6 +238,12 @@
 
 	onMounted(() => {
 		setNavActionStyle()
+		initAudio()
+		loadSettings()
+	})
+
+	onShow(() => {
+		loadSettings()
 	})
 
 	onLoad((query) => {
@@ -197,6 +253,7 @@
 	})
 
 	onUnmounted(() => {
+		destroyAudio()
 		if (countdownTimer) {
 			clearInterval(countdownTimer)
 			countdownTimer = null
@@ -331,6 +388,7 @@
 			if (userPunched.value) {
 				gestureIndexBottom.value = (gestureIndexBottom.value + 1) % gestures.length
 			}
+			playSound('tick')
 		}, 100)
 	}
 
@@ -356,6 +414,7 @@
 			scoreBlue.value += 1
 		}
 		gameState.value = isMatchOver.value ? GameState.ROUND_OVER : GameState.RESULT
+		playSound('result')
 	}
 
 	const evaluateWinner = (top, bottom) => {
