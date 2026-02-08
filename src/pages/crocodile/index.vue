@@ -162,10 +162,13 @@
 	}
 
 	const initAudio = () => {
+		if (clickAudio && biteAudio) {
+			return
+		}
 		try {
-			clickAudio = uni.createInnerAudioContext()
+			clickAudio = clickAudio || uni.createInnerAudioContext()
 			clickAudio.src = clickSound
-			biteAudio = uni.createInnerAudioContext()
+			biteAudio = biteAudio || uni.createInnerAudioContext()
 			biteAudio.src = biteSound
 		} catch (error) {
 			console.error('Failed to init audio:', error)
@@ -184,16 +187,44 @@
 	}
 
 	const playClickSound = () => {
-		if (soundEnabled.value && clickAudio) {
+		if (!soundEnabled.value) {
+			return
+		}
+		if (!clickAudio || !biteAudio) {
+			initAudio()
+		}
+		if (!clickAudio) {
+			return
+		}
+		try {
+			clickAudio.stop()
 			clickAudio.seek(0)
+		} catch (error) {
+		}
+		try {
 			clickAudio.play()
+		} catch (error) {
 		}
 	}
 
 	const playBiteSound = () => {
-		if (soundEnabled.value && biteAudio) {
+		if (!soundEnabled.value) {
+			return
+		}
+		if (!clickAudio || !biteAudio) {
+			initAudio()
+		}
+		if (!biteAudio) {
+			return
+		}
+		try {
+			biteAudio.stop()
 			biteAudio.seek(0)
+		} catch (error) {
+		}
+		try {
 			biteAudio.play()
+		} catch (error) {
 		}
 	}
 
