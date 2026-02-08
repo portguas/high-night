@@ -94,7 +94,7 @@
 	import uma from 'umtrack-wx'
 	import { TrackEvents } from '@/utils/tracker'
 
-	const backgroundImage = '/static/assets/rps/background.jpg'
+	const backgroundImage = '/static/assets/common/background.jpg'
 	const noiseImage = '/static/assets/rps/noise.png'
 	const backIcon = '/static/assets/rps/icon-back.svg'
 	const resultIcon = '/static/assets/rps/icon-trophy.svg'
