@@ -124,6 +124,7 @@
 	const diceSelectorOptions = [1, 2, 3, 4, 5]
 	let shakeTimer = null
 	let diceAudio = null
+	const audioLogPrefix = '[dice][audio]'
 
 	const storageKeys = {
 		soundEnabled: 'settings.soundEnabled',
@@ -225,7 +226,20 @@
 			diceAudio = uni.createInnerAudioContext()
 			diceAudio.src = diceSound
 			diceAudio.volume = 0.6
+			diceAudio.onCanplay(() => {
+				console.log(audioLogPrefix, 'canplay')
+			})
+			diceAudio.onPlay(() => {
+				console.log(audioLogPrefix, 'play')
+			})
+			diceAudio.onEnded(() => {
+				console.log(audioLogPrefix, 'ended')
+			})
+			diceAudio.onError((error) => {
+				console.warn(audioLogPrefix, 'error', error)
+			})
 		} catch (error) {
+			console.warn(audioLogPrefix, 'init failed', error)
 		}
 	}
 
@@ -274,13 +288,23 @@
 	}
 
 	const playSound = () => {
-		if (!soundEnabled.value || !diceAudio) {
+		if (!soundEnabled.value) {
+			console.log(audioLogPrefix, 'skip, sound disabled')
+			return
+		}
+		if (!diceAudio) {
+			console.warn(audioLogPrefix, 'audio not ready, try init')
+			initAudio()
+		}
+		if (!diceAudio) {
+			console.warn(audioLogPrefix, 'audio init failed, skip')
 			return
 		}
 		try {
 			diceAudio.seek(0)
 			diceAudio.play()
 		} catch (error) {
+			console.warn(audioLogPrefix, 'play failed', error)
 		}
 	}
 

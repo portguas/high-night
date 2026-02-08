@@ -112,7 +112,7 @@
 	import uma from 'umtrack-wx'
 	import { TrackEvents } from '@/utils/tracker'
 
-	const backgroundImage = '/static/assets/crocodile/background.jpg'
+	const backgroundImage = '/static/assets/common/background.jpg'
 	const noiseImage = '/static/assets/crocodile/noise.png'
 	const backIcon = '/static/assets/crocodile/icon-back.svg'
 	const clickSound = '/static/assets/crocodile/croco-click.mp3'

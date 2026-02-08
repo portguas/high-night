@@ -4,7 +4,7 @@ uma.init({
   appKey: '6986e1a19a7f37648858d9ef',
   useOpenid: true,
   autoGetOpenid: true,
-  debug: false
+  debug: false,
 })
 
 

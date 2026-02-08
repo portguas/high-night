@@ -114,7 +114,7 @@
 	import uma from 'umtrack-wx'
 	import { TrackEvents } from '@/utils/tracker'
 
-	const backgroundImage = '/static/assets/party/background.jpg'
+	const backgroundImage = '/static/assets/common/background.jpg'
 	const noiseImage = '/static/assets/party/noise.png'
 	const backIcon = '/static/assets/rps/icon-back.svg'
 	const navActionStyle = ref({})

@@ -55,7 +55,7 @@
 		import DarePromptModal from '../../components/DarePromptModal.vue'
 		import promptData from '../../data/truth-dare.json'
 
-		const backgroundImage = '/static/assets/truth/background.jpg'
+		const backgroundImage = '/static/assets/common/background.jpg'
 		const noiseImage = '/static/assets/truth/noise.png'
 		const truthModal = ref(null)
 		const dareModal = ref(null)
