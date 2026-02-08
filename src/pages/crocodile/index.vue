@@ -19,7 +19,7 @@
 					<view class="game-panel-bg"></view>
 					<view class="game-center">
 						<view class="game-title">
-							<text class="game-title-text">CROCO BITE</text>
+							<text class="game-title-text">手指保卫战</text>
 						</view>
 						<view class="crocodile" :class="{ 'is-closing': isMouthClosing }">
 							<view class="crocodile-glow"></view>
