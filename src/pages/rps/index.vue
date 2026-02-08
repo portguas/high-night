@@ -133,6 +133,7 @@
 	let resultTimer = null
 	let tickAudio = null
 	let resultAudio = null
+	let isTickPlaying = false
 
 	const handleBack = () => {
 		uni.navigateBack({
@@ -152,6 +153,8 @@
 			tickAudio = uni.createInnerAudioContext()
 			tickAudio.src = tickSound
 			tickAudio.volume = 0.3
+			tickAudio.loop = true
+			// tickAudio.playbackRate = 1.5
 			
 			resultAudio = uni.createInnerAudioContext()
 			resultAudio.src = resultSound
@@ -170,16 +173,27 @@
 			resultAudio.destroy()
 			resultAudio = null
 		}
+		isTickPlaying = false
 	}
 
 	const playSound = (type) => {
-		if (!soundEnabled.value) return
-		
-		const audio = type === 'tick' ? tickAudio : resultAudio
-		if (audio) {
-			audio.stop()
-			audio.play()
+		if (!soundEnabled.value) {
+			return
 		}
+		const audio = type === 'tick' ? tickAudio : resultAudio
+		if (!audio) {
+			return
+		}
+		if (type === 'tick') {
+			if (isTickPlaying) {
+				return
+			}
+			audio.play()
+			isTickPlaying = true
+			return
+		}
+		audio.stop()
+		audio.play()
 	}
 
 	const applyMatchMode = (mode) => {
@@ -363,6 +377,7 @@
 		if (gameState.value !== GameState.ROLLING) {
 			return
 		}
+		const isFirstPunch = !userPunched.value && !opponentPunched.value
 		if (role === 'user') {
 			if (userPunched.value) {
 				return
@@ -377,6 +392,9 @@
 			uma.trackEvent(TrackEvents.RPS_CLICK_PUNCH, { role: 'opponent' })
 			opponentPunched.value = true
 			advanceGesture(role)
+		}
+		if (isFirstPunch) {
+			playSound('tick')
 		}
 		startRolling()
 		if (gameState.value === GameState.ROLLING && userPunched.value && opponentPunched.value) {
@@ -395,7 +413,6 @@
 			if (userPunched.value) {
 				gestureIndexBottom.value = (gestureIndexBottom.value + 1) % gestures.length
 			}
-			playSound('tick')
 		}, 100)
 	}
 
@@ -412,6 +429,10 @@
 		if (rollingTimer) {
 			clearInterval(rollingTimer)
 			rollingTimer = null
+		}
+		if (tickAudio && isTickPlaying) {
+			tickAudio.stop()
+			isTickPlaying = false
 		}
 		winner.value = evaluateWinner(gestureIndexTop.value, gestureIndexBottom.value)
 		if (winner.value === 'red') {
