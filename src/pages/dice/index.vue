@@ -97,7 +97,7 @@
 
 <script setup>
 	import { computed, onMounted, onUnmounted, ref } from 'vue'
-	import { onShow } from '@dcloudio/uni-app'
+	import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
 	import uma from 'umtrack-wx'
 	import { TrackEvents } from '@/utils/tracker'
 
@@ -432,6 +432,12 @@
 			closeCup()
 		}
 	}
+
+	onShareAppMessage(() => ({
+		title: '醉会玩｜聚会小游戏合集',
+		path: '/pages/index/index',
+		imageUrl: 'https://mmbiz.qpic.cn/sz_mmbiz_png/6feDOP0n7jgKQR5cbpQ8vInPhHVsqhUPAP3aHy3AfVJiacSicicJj8kUdcbIiaonnDhh0hKchjRos1ekQvb69ua14qbEdFAjQ6VjbN2Cuya2q24/640?wx_fmt=png&from=appmsg'
+	}))
 </script>
 
 <style lang="scss" scoped>
